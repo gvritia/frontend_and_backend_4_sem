@@ -10,6 +10,7 @@ let products = [
     { id: 3, title: 'Наушники', price: 5000 },
 ];
 
+
 app.get('/', (req, res) => {
     res.send('API товаров работает');
 });
