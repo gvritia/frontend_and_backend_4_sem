@@ -1,0 +1,18 @@
+{
+  "name": "game-shop-backend",
+  "version": "1.0.0",
+  "description": "API для интернет-магазина геймерских товаров",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

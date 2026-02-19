@@ -1,0 +1,117 @@
+$bg: #0b0f19;
+$text: #e7eaf3;
+$border: rgba(255, 255, 255, 0.1);
+$primary: rgba(99, 102, 241, 0.5);
+$danger: rgba(239, 68, 68, 0.5);
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $bg;
+  color: $text;
+}
+
+.header {
+  border-bottom: 1px solid $border;
+
+  &__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.main {
+  flex: 1;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid $border;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  &--primary {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid $primary;
+  }
+
+  &--danger {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid $danger;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.userRow {
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.userMain {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer {
+  border-top: 1px solid $border;
+  text-align: center;
+  padding: 12px;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #0f1526;
+  border: 1px solid $border;
+  border-radius: 16px;
+  width: 400px;
+  padding: 16px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid $border;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
