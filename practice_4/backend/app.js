@@ -31,42 +31,30 @@ app.use((req, res, next) => {
  * @swagger
  * components:
  *   schemas:
- *     Product:
+ *     User:
  *       type: object
  *       required:
  *         - name
- *         - category
+ *         - age
  *       properties:
  *         id:
  *           type: string
  *           example: "abc123"
  *         name:
  *           type: string
- *           example: "Игровая мышь Razer"
- *         category:
- *           type: string
- *           example: "Мыши"
- *         description:
- *           type: string
- *           example: "Высокоточная игровая мышь"
- *         price:
+ *           example: "Иван"
+ *         age:
  *           type: number
- *           example: 79
- *         stock:
- *           type: number
- *           example: 10
- *         rating:
- *           type: number
- *           example: 4.8
+ *           example: 25
  */
 
 const swaggerOptions = {
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "Game Shop API",
+            title: "Users API",
             version: "1.0.0",
-            description: "API интернет-магазина игровых товаров"
+            description: "API для работы с пользователями"
         },
         servers: [
             {
@@ -80,169 +68,108 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-let products = [
-    {
-        id: nanoid(6),
-        name: "Игровая мышь Razer",
-        category: "Мыши",
-        description: "Высокоточная игровая мышь с RGB подсветкой",
-        price: 79,
-        stock: 15,
-        rating: 4.8
-    },
-    {
-        id: nanoid(6),
-        name: "Механическая клавиатура Logitech",
-        category: "Клавиатуры",
-        description: "Механическая клавиатура с синими переключателями",
-        price: 120,
-        stock: 8,
-        rating: 4.7
-    }
+let users = [
+    { id: nanoid(6), name: "Иван", age: 25 },
+    { id: nanoid(6), name: "Мария", age: 30 }
 ];
 
-function findProductOr404(id, res) {
-    const product = products.find(p => p.id === id);
-    if (!product) {
-        res.status(404).json({ error: "Product not found" });
+function findUserOr404(id, res) {
+    const user = users.find(u => u.id === id);
+    if (!user) {
+        res.status(404).json({ error: "User not found" });
         return null;
     }
-    return product;
+    return user;
 }
 
 /**
  * @swagger
- * /api/products:
+ * /api/users:
  *   get:
- *     summary: Получить список товаров
- *     tags: [Products]
+ *     summary: Получить список пользователей
+ *     tags: [Users]
  *     responses:
  *       200:
- *         description: Список товаров
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *         description: Список пользователей
  */
-app.get("/api/products", (req, res) => {
-    res.json(products);
+app.get("/api/users", (req, res) => {
+    res.json(users);
 });
 
 /**
  * @swagger
- * /api/products/{id}:
+ * /api/users/{id}:
  *   get:
- *     summary: Получить товар по ID
- *     tags: [Products]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Товар найден
- *       404:
- *         description: Товар не найден
+ *     summary: Получить пользователя по ID
+ *     tags: [Users]
  */
-app.get("/api/products/:id", (req, res) => {
-    const product = findProductOr404(req.params.id, res);
-    if (!product) return;
-    res.json(product);
+app.get("/api/users/:id", (req, res) => {
+    const user = findUserOr404(req.params.id, res);
+    if (!user) return;
+    res.json(user);
 });
 
 /**
  * @swagger
- * /api/products:
+ * /api/users:
  *   post:
- *     summary: Создать новый товар
- *     tags: [Products]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Product'
- *     responses:
- *       201:
- *         description: Товар создан
- *       400:
- *         description: Ошибка валидации
+ *     summary: Создать пользователя
+ *     tags: [Users]
  */
-app.post("/api/products", (req, res) => {
-    const { name, category, description, price, stock, rating } = req.body;
+app.post("/api/users", (req, res) => {
+    const { name, age } = req.body;
 
-    if (!name || !category) {
-        return res.status(400).json({ error: "Name and category are required" });
+    if (!name || age === undefined) {
+        return res.status(400).json({ error: "Name and age are required" });
     }
 
-    const newProduct = {
+    const newUser = {
         id: nanoid(6),
         name: name.trim(),
-        category: category.trim(),
-        description: description?.trim() || "",
-        price: Number(price) || 0,
-        stock: Number(stock) || 0,
-        rating: Number(rating) || 0
+        age: Number(age)
     };
 
-    products.push(newProduct);
-    res.status(201).json(newProduct);
+    users.push(newUser);
+    res.status(201).json(newUser);
 });
 
 /**
  * @swagger
- * /api/products/{id}:
+ * /api/users/{id}:
  *   patch:
- *     summary: Обновить товар
- *     tags: [Products]
+ *     summary: Обновить пользователя
+ *     tags: [Users]
  */
-app.patch("/api/products/:id", (req, res) => {
-    const product = findProductOr404(req.params.id, res);
-    if (!product) return;
+app.patch("/api/users/:id", (req, res) => {
+    const user = findUserOr404(req.params.id, res);
+    if (!user) return;
 
-    const { name, category, description, price, stock, rating } = req.body;
+    const { name, age } = req.body;
 
-    if (name !== undefined) product.name = name.trim();
-    if (category !== undefined) product.category = category.trim();
-    if (description !== undefined) product.description = description.trim();
-    if (price !== undefined) product.price = Number(price);
-    if (stock !== undefined) product.stock = Number(stock);
-    if (rating !== undefined) product.rating = Number(rating);
+    if (name !== undefined) user.name = name.trim();
+    if (age !== undefined) user.age = Number(age);
 
-    res.json(product);
+    res.json(user);
 });
 
 /**
  * @swagger
- * /api/products/{id}:
+ * /api/users/{id}:
  *   delete:
- *     summary: Удалить товар
- *     tags: [Products]
+ *     summary: Удалить пользователя
+ *     tags: [Users]
  */
-app.delete("/api/products/:id", (req, res) => {
-    const exists = products.some(p => p.id === req.params.id);
+app.delete("/api/users/:id", (req, res) => {
+    const exists = users.some(u => u.id === req.params.id);
     if (!exists) {
-        return res.status(404).json({ error: "Product not found" });
+        return res.status(404).json({ error: "User not found" });
     }
 
-    products = products.filter(p => p.id !== req.params.id);
+    users = users.filter(u => u.id !== req.params.id);
     res.status(204).send();
-});
-
-app.use((req, res) => {
-    res.status(404).json({ error: "Not found" });
-});
-
-app.use((err, req, res, next) => {
-    console.error("Unhandled error:", err);
-    res.status(500).json({ error: "Internal server error" });
 });
 
 app.listen(port, () => {
     console.log(`Сервер запущен на http://localhost:${port}`);
-    console.log(`Swagger документация: http://localhost:${port}/api-docs`);
+    console.log(`Swagger: http://localhost:${port}/api-docs`);
 });

@@ -9,32 +9,32 @@ const apiClient = axios.create({
 });
 
 export const api = {
-    // Получить все товары
-    getProducts: async () => {
-        const response = await apiClient.get("/products");
+    // Получить всех пользователей
+    getUsers: async () => {
+        const response = await apiClient.get("/users");
         return response.data;
     },
 
-    // Получить товар по id
-    getProductById: async (id) => {
-        const response = await apiClient.get(`/products/${id}`);
+    // Получить пользователя по id
+    getUserById: async (id) => {
+        const response = await apiClient.get(`/users/${id}`);
         return response.data;
     },
 
-    // Создать товар
-    createProduct: async (product) => {
-        const response = await apiClient.post("/products", product);
+    // Создать пользователя
+    createUser: async (user) => {
+        const response = await apiClient.post("/users", user);
         return response.data;
     },
 
-    // Обновить товар
-    updateProduct: async (id, product) => {
-        const response = await apiClient.patch(`/products/${id}`, product);
+    // Обновить пользователя
+    updateUser: async (id, user) => {
+        const response = await apiClient.patch(`/users/${id}`, user);
         return response.data;
     },
 
-    // Удалить товар
-    deleteProduct: async (id) => {
-        await apiClient.delete(`/products/${id}`);
+    // Удалить пользователя
+    deleteUser: async (id) => {
+        await apiClient.delete(`/users/${id}`);
     },
 };
