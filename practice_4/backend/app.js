@@ -2,6 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const { nanoid } = require("nanoid");
 
+// Swagger
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 const app = express();
 const port = 3000;
 
@@ -23,6 +27,59 @@ app.use((req, res, next) => {
     next();
 });
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       required:
+ *         - name
+ *         - category
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "abc123"
+ *         name:
+ *           type: string
+ *           example: "Игровая мышь Razer"
+ *         category:
+ *           type: string
+ *           example: "Мыши"
+ *         description:
+ *           type: string
+ *           example: "Высокоточная игровая мышь"
+ *         price:
+ *           type: number
+ *           example: 79
+ *         stock:
+ *           type: number
+ *           example: 10
+ *         rating:
+ *           type: number
+ *           example: 4.8
+ */
+
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Game Shop API",
+            version: "1.0.0",
+            description: "API интернет-магазина игровых товаров"
+        },
+        servers: [
+            {
+                url: "http://localhost:3000"
+            }
+        ]
+    },
+    apis: ["./app.js"]
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 let products = [
     {
         id: nanoid(6),
@@ -41,81 +98,8 @@ let products = [
         price: 120,
         stock: 8,
         rating: 4.7
-    },
-    {
-        id: nanoid(6),
-        name: "Игровая гарнитура HyperX",
-        category: "Гарнитуры",
-        description: "Объёмный звук 7.1 для полного погружения",
-        price: 95,
-        stock: 12,
-        rating: 4.6
-    },
-    {
-        id: nanoid(6),
-        name: "Коврик SteelSeries",
-        category: "Аксессуары",
-        description: "Большой игровой коврик для мыши",
-        price: 25,
-        stock: 30,
-        rating: 4.5
-    },
-    {
-        id: nanoid(6),
-        name: "Геймпад Xbox",
-        category: "Геймпады",
-        description: "Беспроводной контроллер для ПК и Xbox",
-        price: 65,
-        stock: 10,
-        rating: 4.9
-    },
-    {
-        id: nanoid(6),
-        name: "Веб-камера Logitech C920",
-        category: "Камеры",
-        description: "Full HD камера для стриминга",
-        price: 85,
-        stock: 7,
-        rating: 4.4
-    },
-    {
-        id: nanoid(6),
-        name: "Игровой монитор 144Hz",
-        category: "Мониторы",
-        description: "Монитор с частотой обновления 144 Гц",
-        price: 230,
-        stock: 5,
-        rating: 4.8
-    },
-    {
-        id: nanoid(6),
-        name: "Игровое кресло DXRacer",
-        category: "Кресла",
-        description: "Эргономичное кресло для геймеров",
-        price: 310,
-        stock: 4,
-        rating: 4.9
-    },
-    {
-        id: nanoid(6),
-        name: "Микрофон Blue Yeti",
-        category: "Микрофоны",
-        description: "Студийный микрофон для стримов",
-        price: 140,
-        stock: 6,
-        rating: 4.7
-    },
-    {
-        id: nanoid(6),
-        name: "Игровой стол",
-        category: "Мебель",
-        description: "Стол с кабель-менеджментом и RGB",
-        price: 260,
-        stock: 3,
-        rating: 4.6
     }
 ];
-
 
 function findProductOr404(id, res) {
     const product = products.find(p => p.id === id);
@@ -126,7 +110,68 @@ function findProductOr404(id, res) {
     return product;
 }
 
+/**
+ * @swagger
+ * /api/products:
+ *   get:
+ *     summary: Получить список товаров
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Список товаров
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Product'
+ */
+app.get("/api/products", (req, res) => {
+    res.json(products);
+});
 
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   get:
+ *     summary: Получить товар по ID
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Товар найден
+ *       404:
+ *         description: Товар не найден
+ */
+app.get("/api/products/:id", (req, res) => {
+    const product = findProductOr404(req.params.id, res);
+    if (!product) return;
+    res.json(product);
+});
+
+/**
+ * @swagger
+ * /api/products:
+ *   post:
+ *     summary: Создать новый товар
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       201:
+ *         description: Товар создан
+ *       400:
+ *         description: Ошибка валидации
+ */
 app.post("/api/products", (req, res) => {
     const { name, category, description, price, stock, rating } = req.body;
 
@@ -148,17 +193,13 @@ app.post("/api/products", (req, res) => {
     res.status(201).json(newProduct);
 });
 
-app.get("/api/products", (req, res) => {
-    res.json(products);
-});
-
-app.get("/api/products/:id", (req, res) => {
-    const product = findProductOr404(req.params.id, res);
-    if (!product) return;
-    res.json(product);
-});
-
-
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   patch:
+ *     summary: Обновить товар
+ *     tags: [Products]
+ */
 app.patch("/api/products/:id", (req, res) => {
     const product = findProductOr404(req.params.id, res);
     if (!product) return;
@@ -175,7 +216,13 @@ app.patch("/api/products/:id", (req, res) => {
     res.json(product);
 });
 
-
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   delete:
+ *     summary: Удалить товар
+ *     tags: [Products]
+ */
 app.delete("/api/products/:id", (req, res) => {
     const exists = products.some(p => p.id === req.params.id);
     if (!exists) {
@@ -185,7 +232,6 @@ app.delete("/api/products/:id", (req, res) => {
     products = products.filter(p => p.id !== req.params.id);
     res.status(204).send();
 });
-
 
 app.use((req, res) => {
     res.status(404).json({ error: "Not found" });
@@ -198,4 +244,5 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
     console.log(`Сервер запущен на http://localhost:${port}`);
+    console.log(`Swagger документация: http://localhost:${port}/api-docs`);
 });
