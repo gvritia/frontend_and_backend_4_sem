@@ -30,5 +30,10 @@ global.removeRefreshToken = (token) => {
     global.refreshTokens = global.refreshTokens.filter(rt => rt.token !== token);
 };
 
+global.removeExpiredRefreshTokens = () => {
+    const now = new Date();
+    global.refreshTokens = global.refreshTokens.filter(rt => new Date(rt.expiresAt) > now);
+};
+
 console.log('Глобальные переменные инициализированы');
 console.log('JWT секреты загружены');
